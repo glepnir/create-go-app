@@ -40,13 +40,11 @@ func task() {
 	if err := os.MkdirAll(app, 0755); err != nil {
 		log.Fatal("create folder failed")
 	}
-	fmt.Println(app)
 
 	err := os.Chdir(app)
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println(options)
 
 	cmd := exec.Command("go", "mod", "init", options)
 	cmd.Dir = app
