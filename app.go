@@ -93,5 +93,8 @@ func createProject(projectLayout map[string]interface{}) {
 				}
 			}
 		}
+		if f, ok := v.(string); ok {
+			os.Mkdir(fullpath(f, appName), 0777)
+		}
 	}
 }
