@@ -1,0 +1,13 @@
+app: echoweb
+
+module: github.com/glepnir/echoweb
+
+layout:
+  - cmd:
+    - app.go
+  - internal:
+    - api
+    - repository
+    - service
+  - pkg
+
