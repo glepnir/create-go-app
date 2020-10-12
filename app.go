@@ -6,7 +6,6 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
@@ -23,32 +22,34 @@ var (
 func main() {
 	flag.StringVar(&layoutYaml, "l", "", "a project layout yaml file path")
 	flag.Parse()
-	projectLayout := make(map[string]interface{})
-	parseLayout(projectLayout)
-	createProject(projectLayout)
+	appLayout := make(map[string]interface{})
+	parseLayout(appLayout)
+	createApp(appLayout)
+}
+
+func checkErr(err error) {
+	if err != nil {
+		printError(err.Error())
+		return
+	}
 }
 
 func fullpath(dir string, approot ...string) string {
 	currentDir, err := os.Getwd()
-	if err != nil {
-		log.Fatal(err)
-	}
+	checkErr(err)
 	if len(approot) > 0 {
 		return currentDir + osSparator() + approot[0] + osSparator() + dir
 	}
 	return currentDir + osSparator() + dir
 }
 
-func parseLayout(projectLayout map[string]interface{}) {
+func parseLayout(appLayout map[string]interface{}) {
 	contents, err := ioutil.ReadFile(layoutYaml)
+	checkErr(err)
+	err = yaml.Unmarshal(contents, appLayout)
 	if err != nil {
 		log.Fatal(err)
 	}
-	err = yaml.Unmarshal(contents, projectLayout)
-	if err != nil {
-		log.Fatal(err)
-	}
-	fmt.Println(projectLayout)
 }
 
 func osSparator() string {
@@ -61,7 +62,7 @@ func osSparator() string {
 func isFile(file interface{}) bool {
 	f, ok := file.(string)
 	if !ok {
-		log.Fatal("not a string value")
+		printWarn("Something wron in isfile function")
 		return false
 	}
 	ext := filepath.Ext(f)
@@ -71,17 +72,15 @@ func isFile(file interface{}) bool {
 	return true
 }
 
-func createProject(projectLayout map[string]interface{}) {
-	appName, ok := projectLayout["app"].(string)
+func createApp(appLayout map[string]interface{}) {
+	appName, ok := appLayout["app"].(string)
 	if !ok {
-		log.Fatal("layout yaml file format wrong miss filed app")
+		printError("Failed create app missed app keyword")
 		return
 	}
 	err := os.Mkdir(fullpath(appName), 0777)
-	if err != nil {
-		log.Fatal(err)
-	}
-	layout, ok := projectLayout["layout"].([]interface{})
+	checkErr(err)
+	layout, ok := appLayout["layout"].([]interface{})
 
 	for _, v := range layout {
 		if f, ok := v.(map[interface{}]interface{}); ok {
