@@ -11,6 +11,7 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
+	"strings"
 
 	"gopkg.in/yaml.v2"
 )
@@ -35,12 +36,17 @@ func checkErr(err error) {
 }
 
 func fullpath(dir string, approot ...string) string {
+	var sb strings.Builder
 	currentDir, err := os.Getwd()
 	checkErr(err)
+	sb.WriteString(currentDir)
+	sb.WriteString(osSparator())
 	if len(approot) > 0 {
-		return currentDir + osSparator() + approot[0] + osSparator() + dir
+		sb.WriteString(approot[0])
+		sb.WriteString(osSparator())
 	}
-	return currentDir + osSparator() + dir
+	sb.WriteString(dir)
+	return sb.String()
 }
 
 func parseLayout(appLayout map[string]interface{}) {
